@@ -1,0 +1,24 @@
+{
+    "appKeys": {
+        "dummy": 0
+    },
+    "capabilities": [
+        ""
+    ],
+    "companyName": "Dane Summers",
+    "longName": "Analog&Day",
+    "projectType": "native",
+    "resources": {
+        "media": []
+    },
+    "sdkVersion": "3",
+    "shortName": "A&D",
+    "targetPlatforms": [
+        "basalt"
+    ],
+    "uuid": "710fd652-4c5b-4905-a791-78049096497e",
+    "versionLabel": "1.1",
+    "watchapp": {
+        "watchface": true
+    }
+}
