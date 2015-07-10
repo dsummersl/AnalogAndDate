@@ -9,7 +9,14 @@
     "longName": "Analog&Day",
     "projectType": "native",
     "resources": {
-        "media": []
+        "media": [
+            {
+                "file": "images/menu.png",
+                "menuIcon": true,
+                "name": "MENU",
+                "type": "png"
+            }
+        ]
     },
     "sdkVersion": "3",
     "shortName": "A&D",
