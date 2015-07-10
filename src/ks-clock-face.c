@@ -5,10 +5,10 @@
 #define CLOCKFACE    false
 
 #define HAND_MARGIN  10
-#define FINAL_RADIUS 55
+#define FINAL_RADIUS 65
 
-#define ANIMATION_DURATION 500
-#define ANIMATION_DELAY    600
+#define ANIMATION_DURATION 400
+#define ANIMATION_DELAY    500
 
 typedef struct {
   int hours;
@@ -89,7 +89,7 @@ static void update_proc(Layer *layer, GContext *ctx) {
     graphics_fill_rect(ctx, GRect(0, 0, 144, 168), 0, GCornerNone);
   }
 
-  graphics_context_set_stroke_width(ctx, 6);
+  graphics_context_set_stroke_width(ctx, 7);
   graphics_context_set_antialiased(ctx, ANTIALIASING);
 
   if(CLOCKFACE) {
@@ -125,16 +125,16 @@ static void update_proc(Layer *layer, GContext *ctx) {
     .y = (int16_t)(-cos_lookup(hour_angle) * (int32_t)(s_radius - (2 * HAND_MARGIN)) / TRIG_MAX_RATIO) + s_center.y,
   };
 
-  graphics_context_set_stroke_color(ctx, GColorGreen);
+  graphics_context_set_stroke_color(ctx, GColorDarkGray);
   graphics_draw_line(ctx, s_top, s_top);
 
   // Draw hands with positive length only
   if(s_radius > HAND_MARGIN) {
-    graphics_context_set_stroke_color(ctx, GColorGreen);
+    graphics_context_set_stroke_color(ctx, GColorMintGreen);
     graphics_draw_line(ctx, s_center, minute_hand);
   }
   if(s_radius > 2 * HAND_MARGIN) {
-    graphics_context_set_stroke_color(ctx, GColorRed);
+    graphics_context_set_stroke_color(ctx, GColorFolly);
     graphics_draw_line(ctx, s_center, hour_hand);
   }
 }
@@ -184,7 +184,7 @@ static void window_load(Window *window) {
   s_num_label = text_layer_create(GRect(73 - 28, 168 - 30, 28, 30));
   text_layer_set_text(s_num_label, s_num_buffer);
   text_layer_set_background_color(s_num_label, GColorBlack);
-  text_layer_set_text_color(s_num_label, GColorLightGray);
+  text_layer_set_text_color(s_num_label, GColorDarkGray);
   text_layer_set_font(s_num_label, fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD));
   text_layer_set_text_alignment(s_num_label, GTextAlignmentRight);
   layer_add_child(s_date_layer, text_layer_get_layer(s_num_label));
@@ -192,7 +192,7 @@ static void window_load(Window *window) {
   s_suffix_label = text_layer_create(GRect(73, 168 - 25, 18, 20));
   text_layer_set_text(s_suffix_label, s_suffix_buffer);
   text_layer_set_background_color(s_suffix_label, GColorBlack);
-  text_layer_set_text_color(s_suffix_label, GColorLightGray);
+  text_layer_set_text_color(s_suffix_label, GColorDarkGray);
   text_layer_set_font(s_suffix_label, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD));
   layer_add_child(s_date_layer, text_layer_get_layer(s_suffix_label));
 }
