@@ -16,7 +16,7 @@ typedef struct {
 } Time;
 
 static Window *s_main_window;
-static Layer *s_canvas_layer, *s_date_layer;
+static Layer *s_canvas_layer, *s_date_layer, *background_layer;
 
 static GPoint s_center, s_top;
 static Time s_last_time, s_anim_time;
@@ -78,7 +78,7 @@ static int hours_to_minutes(int hours_out_of_12) {
   return (int)(float)(((float)hours_out_of_12 / 12.0F) * 60.0F);
 }
 
-static void update_proc(Layer *layer, GContext *ctx) {
+static void update_background(Layer *layer, GContext *ctx) {
   // Color background?
   if(COLORS) {
     graphics_context_set_fill_color(ctx, GColorFromRGB(s_color_channels[0], s_color_channels[1], s_color_channels[2]));
@@ -88,8 +88,9 @@ static void update_proc(Layer *layer, GContext *ctx) {
     graphics_context_set_fill_color(ctx, GColorBlack);
     graphics_fill_rect(ctx, GRect(0, 0, 144, 168), 0, GCornerNone);
   }
+}
 
-  graphics_context_set_stroke_width(ctx, 7);
+static void update_clock(Layer *layer, GContext *ctx) {
   graphics_context_set_antialiased(ctx, ANTIALIASING);
 
   if(CLOCKFACE) {
@@ -125,6 +126,7 @@ static void update_proc(Layer *layer, GContext *ctx) {
     .y = (int16_t)(-cos_lookup(hour_angle) * (int32_t)(s_radius - (2 * HAND_MARGIN)) / TRIG_MAX_RATIO) + s_center.y,
   };
 
+  graphics_context_set_stroke_width(ctx, 7);
   graphics_context_set_stroke_color(ctx, GColorDarkGray);
   graphics_draw_line(ctx, s_top, s_top);
 
@@ -134,6 +136,7 @@ static void update_proc(Layer *layer, GContext *ctx) {
     graphics_draw_line(ctx, s_center, minute_hand);
   }
   if(s_radius > 2 * HAND_MARGIN) {
+    graphics_context_set_stroke_width(ctx, 5);
     graphics_context_set_stroke_color(ctx, GColorFolly);
     graphics_draw_line(ctx, s_center, hour_hand);
   }
@@ -173,9 +176,9 @@ static void window_load(Window *window) {
   s_top = grect_center_point(&window_bounds);
   s_top.y = 10;
 
-  s_canvas_layer = layer_create(window_bounds);
-  layer_set_update_proc(s_canvas_layer, update_proc);
-  layer_add_child(window_layer, s_canvas_layer);
+  background_layer = layer_create(window_bounds);
+  layer_set_update_proc(background_layer, update_background);
+  layer_add_child(window_layer, background_layer);
 
   s_date_layer = layer_create(window_bounds);
   layer_set_update_proc(s_date_layer, date_update_proc);
@@ -195,9 +198,14 @@ static void window_load(Window *window) {
   text_layer_set_text_color(s_suffix_label, GColorDarkGray);
   text_layer_set_font(s_suffix_label, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD));
   layer_add_child(s_date_layer, text_layer_get_layer(s_suffix_label));
+
+  s_canvas_layer = layer_create(window_bounds);
+  layer_set_update_proc(s_canvas_layer, update_clock);
+  layer_add_child(window_layer, s_canvas_layer);
 }
 
 static void window_unload(Window *window) {
+  layer_destroy(background_layer);
   layer_destroy(s_canvas_layer);
   layer_destroy(s_date_layer);
 
