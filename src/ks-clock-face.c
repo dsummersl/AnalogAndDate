@@ -4,8 +4,8 @@
 #define ANTIALIASING true
 #define CLOCKFACE    false
 
-#define HAND_MARGIN  10
-#define FINAL_RADIUS 65
+#define HAND_MARGIN  20
+#define FINAL_RADIUS 75
 
 #define ANIMATION_DURATION 400
 #define ANIMATION_DELAY    500
@@ -106,6 +106,9 @@ static void update_clock(Layer *layer, GContext *ctx) {
   Time mode_time = (s_animating) ? s_anim_time : s_last_time;
 
   // Adjust for minutes through the hour
+  // test values for the ui:
+  // mode_time.hours = 1;
+  // mode_time.minutes = 0;
   float minute_angle = TRIG_MAX_ANGLE * mode_time.minutes / 60;
   float hour_angle;
   if(s_animating) {
@@ -126,26 +129,23 @@ static void update_clock(Layer *layer, GContext *ctx) {
     .y = (int16_t)(-cos_lookup(hour_angle) * (int32_t)(s_radius - (2 * HAND_MARGIN)) / TRIG_MAX_RATIO) + s_center.y,
   };
 
-  graphics_context_set_stroke_width(ctx, 12);
+  graphics_context_set_stroke_width(ctx, 10);
   graphics_context_set_stroke_color(ctx, GColorDarkGray);
   graphics_draw_line(ctx, s_top, s_top);
 
   // Draw hands with positive length only
-  if(s_radius > HAND_MARGIN) {
-    graphics_context_set_stroke_width(ctx, 12);
-    graphics_context_set_stroke_color(ctx, GColorWhite);
-    graphics_draw_line(ctx, s_center, minute_hand);
-    graphics_context_set_stroke_width(ctx, 4);
-    graphics_context_set_stroke_color(ctx, GColorMintGreen);
-    graphics_draw_line(ctx, s_center, minute_hand);
-  }
   if(s_radius > 2 * HAND_MARGIN) {
-    graphics_context_set_stroke_width(ctx, 8);
-//     graphics_context_set_stroke_color(ctx, GColorRed);
-//     graphics_draw_line(ctx, s_center, hour_hand);
-//     graphics_context_set_stroke_width(ctx, 4);
+    graphics_context_set_stroke_width(ctx, 17);
+    graphics_context_set_stroke_color(ctx, GColorRed);
+    graphics_draw_line(ctx, s_center, hour_hand);
+    graphics_context_set_stroke_width(ctx, 10);
     graphics_context_set_stroke_color(ctx, GColorFolly);
     graphics_draw_line(ctx, s_center, hour_hand);
+  }
+  if(s_radius > HAND_MARGIN) {
+    graphics_context_set_stroke_width(ctx, 10);
+    graphics_context_set_stroke_color(ctx, GColorWhite);
+    graphics_draw_line(ctx, s_center, minute_hand);
   }
 }
 
@@ -191,19 +191,19 @@ static void window_load(Window *window) {
   layer_set_update_proc(s_date_layer, date_update_proc);
   layer_add_child(window_layer, s_date_layer);
 
-  s_num_label = text_layer_create(GRect(73 - 28, 168 - 30, 28, 30));
+  s_num_label = text_layer_create(GRect(73 - 42, 168 - 44, 42, 42));
   text_layer_set_text(s_num_label, s_num_buffer);
   text_layer_set_background_color(s_num_label, GColorBlack);
   text_layer_set_text_color(s_num_label, GColorDarkGray);
-  text_layer_set_font(s_num_label, fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD));
+  text_layer_set_font(s_num_label, fonts_get_system_font(FONT_KEY_BITHAM_42_BOLD));
   text_layer_set_text_alignment(s_num_label, GTextAlignmentRight);
   layer_add_child(s_date_layer, text_layer_get_layer(s_num_label));
 
-  s_suffix_label = text_layer_create(GRect(73, 168 - 25, 18, 20));
+  s_suffix_label = text_layer_create(GRect(73, 168 - 42, 28, 30));
   text_layer_set_text(s_suffix_label, s_suffix_buffer);
   text_layer_set_background_color(s_suffix_label, GColorBlack);
   text_layer_set_text_color(s_suffix_label, GColorDarkGray);
-  text_layer_set_font(s_suffix_label, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD));
+  text_layer_set_font(s_suffix_label, fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD));
   layer_add_child(s_date_layer, text_layer_get_layer(s_suffix_label));
 
   s_canvas_layer = layer_create(window_bounds);
