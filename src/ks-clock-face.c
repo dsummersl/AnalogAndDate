@@ -126,17 +126,24 @@ static void update_clock(Layer *layer, GContext *ctx) {
     .y = (int16_t)(-cos_lookup(hour_angle) * (int32_t)(s_radius - (2 * HAND_MARGIN)) / TRIG_MAX_RATIO) + s_center.y,
   };
 
-  graphics_context_set_stroke_width(ctx, 7);
+  graphics_context_set_stroke_width(ctx, 12);
   graphics_context_set_stroke_color(ctx, GColorDarkGray);
   graphics_draw_line(ctx, s_top, s_top);
 
   // Draw hands with positive length only
   if(s_radius > HAND_MARGIN) {
+    graphics_context_set_stroke_width(ctx, 12);
+    graphics_context_set_stroke_color(ctx, GColorWhite);
+    graphics_draw_line(ctx, s_center, minute_hand);
+    graphics_context_set_stroke_width(ctx, 4);
     graphics_context_set_stroke_color(ctx, GColorMintGreen);
     graphics_draw_line(ctx, s_center, minute_hand);
   }
   if(s_radius > 2 * HAND_MARGIN) {
-    graphics_context_set_stroke_width(ctx, 5);
+    graphics_context_set_stroke_width(ctx, 8);
+//     graphics_context_set_stroke_color(ctx, GColorRed);
+//     graphics_draw_line(ctx, s_center, hour_hand);
+//     graphics_context_set_stroke_width(ctx, 4);
     graphics_context_set_stroke_color(ctx, GColorFolly);
     graphics_draw_line(ctx, s_center, hour_hand);
   }
