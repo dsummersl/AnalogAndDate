@@ -191,7 +191,7 @@ static void window_load(Window *window) {
   layer_set_update_proc(s_date_layer, date_update_proc);
   layer_add_child(window_layer, s_date_layer);
 
-  s_num_label = text_layer_create(GRect(73 - 42, 168 - 44, 42, 42));
+  s_num_label = text_layer_create(GRect(73 - 42, 168 - 44, 44, 44));
   text_layer_set_text(s_num_label, s_num_buffer);
   text_layer_set_background_color(s_num_label, GColorBlack);
   text_layer_set_text_color(s_num_label, GColorDarkGray);
