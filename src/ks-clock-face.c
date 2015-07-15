@@ -199,7 +199,7 @@ static void window_load(Window *window) {
   text_layer_set_text_alignment(s_num_label, GTextAlignmentRight);
   layer_add_child(s_date_layer, text_layer_get_layer(s_num_label));
 
-  s_suffix_label = text_layer_create(GRect(73, 168 - 42, 28, 30));
+  s_suffix_label = text_layer_create(GRect(73 + 2, 168 - 42, 28, 30));
   text_layer_set_text(s_suffix_label, s_suffix_buffer);
   text_layer_set_background_color(s_suffix_label, GColorBlack);
   text_layer_set_text_color(s_suffix_label, GColorDarkGray);
