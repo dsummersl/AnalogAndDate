@@ -154,6 +154,7 @@ static void date_update_proc(Layer *layer, GContext *ctx) {
   struct tm *t = localtime(&now);
 
   strftime(s_num_buffer, sizeof(s_num_buffer), "%d", t);
+  //snprintf(s_num_buffer, sizeof(s_num_buffer), "%d", 20);
   text_layer_set_text(s_num_label, s_num_buffer);
 
   int day = atoi(s_num_buffer);
@@ -191,7 +192,7 @@ static void window_load(Window *window) {
   layer_set_update_proc(s_date_layer, date_update_proc);
   layer_add_child(window_layer, s_date_layer);
 
-  s_num_label = text_layer_create(GRect(73 - 42, 168 - 44, 44, 44));
+  s_num_label = text_layer_create(GRect(73 - 56, 168 - 44, 56, 46));
   text_layer_set_text(s_num_label, s_num_buffer);
   text_layer_set_background_color(s_num_label, GColorBlack);
   text_layer_set_text_color(s_num_label, GColorDarkGray);
@@ -199,7 +200,7 @@ static void window_load(Window *window) {
   text_layer_set_text_alignment(s_num_label, GTextAlignmentRight);
   layer_add_child(s_date_layer, text_layer_get_layer(s_num_label));
 
-  s_suffix_label = text_layer_create(GRect(73 + 2, 168 - 42, 28, 30));
+  s_suffix_label = text_layer_create(GRect(73 + 2, 168 - 44, 28, 30));
   text_layer_set_text(s_suffix_label, s_suffix_buffer);
   text_layer_set_background_color(s_suffix_label, GColorBlack);
   text_layer_set_text_color(s_suffix_label, GColorDarkGray);
