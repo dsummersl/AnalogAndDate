@@ -1,0 +1,33 @@
+{
+    "author": "Dane Summers",
+    "dependencies": {},
+    "keywords": [],
+    "name": "a-d",
+    "pebble": {
+        "displayName": "Analog&Day",
+        "enableMultiJS": false,
+        "messageKeys": {
+            "dummy": 0
+        },
+        "projectType": "native",
+        "resources": {
+            "media": [
+                {
+                    "file": "images/menu.png",
+                    "menuIcon": true,
+                    "name": "MENU",
+                    "type": "bitmap"
+                }
+            ]
+        },
+        "sdkVersion": "3",
+        "targetPlatforms": [
+            "basalt"
+        ],
+        "uuid": "710fd652-4c5b-4905-a791-78049096497e",
+        "watchapp": {
+            "watchface": true
+        }
+    },
+    "version": "1.2.0"
+}

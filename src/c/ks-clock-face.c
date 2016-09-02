@@ -5,10 +5,6 @@
 #define CLOCKFACE    false
 
 #define HAND_MARGIN  20
-#define FINAL_RADIUS 75
-
-#define ANIMATION_DURATION 400
-#define ANIMATION_DELAY    500
 
 typedef struct {
   int hours;
@@ -20,7 +16,7 @@ static Layer *s_canvas_layer, *s_date_layer, *background_layer;
 
 static GPoint s_center, s_top;
 static Time s_last_time, s_anim_time;
-static int s_radius = 0, s_anim_hours_60 = 0, s_color_channels[3];
+static int s_radius = 75, s_color_channels[3];
 static bool s_animating = false;
 
 const char *TH = "th";
@@ -30,31 +26,6 @@ const char *ND = "nd";
 
 static TextLayer *s_num_label, *s_suffix_label;
 static char s_num_buffer[4],s_suffix_buffer[2];
-
-/*************************** AnimationImplementation **************************/
-
-static void animation_started(Animation *anim, void *context) {
-  s_animating = true;
-}
-
-static void animation_stopped(Animation *anim, bool stopped, void *context) {
-  s_animating = false;
-}
-
-static void animate(int duration, int delay, AnimationImplementation *implementation, bool handlers) {
-  Animation *anim = animation_create();
-  animation_set_duration(anim, duration);
-  animation_set_delay(anim, delay);
-  animation_set_curve(anim, AnimationCurveEaseInOut);
-  animation_set_implementation(anim, implementation);
-  if(handlers) {
-    animation_set_handlers(anim, (AnimationHandlers) {
-      .started = animation_started,
-      .stopped = animation_stopped
-    }, NULL);
-  }
-  animation_schedule(anim);
-}
 
 /************************************ UI **************************************/
 
@@ -72,10 +43,6 @@ static void tick_handler(struct tm *tick_time, TimeUnits changed) {
   if(s_canvas_layer) {
     layer_mark_dirty(s_canvas_layer);
   }
-}
-
-static int hours_to_minutes(int hours_out_of_12) {
-  return (int)(float)(((float)hours_out_of_12 / 12.0F) * 60.0F);
 }
 
 static void update_background(Layer *layer, GContext *ctx) {
@@ -107,7 +74,7 @@ static void update_clock(Layer *layer, GContext *ctx) {
 
   // Adjust for minutes through the hour
   // test values for the ui:
-  // mode_time.hours = 1;
+  // mode_time.hours = 6;
   // mode_time.minutes = 0;
   float minute_angle = TRIG_MAX_ANGLE * mode_time.minutes / 60;
   float hour_angle;
@@ -119,6 +86,14 @@ static void update_clock(Layer *layer, GContext *ctx) {
   }
   hour_angle += (minute_angle / TRIG_MAX_ANGLE) * (TRIG_MAX_ANGLE / 12);
 
+  // TODO plot an arc pointing to the hour slot.
+  const GPathInfo ARC_INFO = {
+    .num_points = 3,
+    .points = (GPoint []) {{1,1}, {50,50}, {25,0}}
+  };
+  GPath *arc = gpath_create(&ARC_INFO);
+  gpath_draw_filled(ctx, arc);
+  
   // Plot hands
   GPoint minute_hand = (GPoint) {
     .x = (int16_t)(sin_lookup(TRIG_MAX_ANGLE * mode_time.minutes / 60) * (int32_t)(s_radius - HAND_MARGIN) / TRIG_MAX_RATIO) + s_center.x,
@@ -130,20 +105,20 @@ static void update_clock(Layer *layer, GContext *ctx) {
   };
 
   graphics_context_set_stroke_width(ctx, 10);
-  graphics_context_set_stroke_color(ctx, GColorDarkGray);
+  graphics_context_set_stroke_color(ctx, GColorLightGray);
   graphics_draw_line(ctx, s_top, s_top);
 
   // Draw hands with positive length only
   if(s_radius > 2 * HAND_MARGIN) {
-    graphics_context_set_stroke_width(ctx, 17);
-    graphics_context_set_stroke_color(ctx, GColorRed);
+    graphics_context_set_stroke_width(ctx, 15);
+    graphics_context_set_stroke_color(ctx, GColorLightGray);
     graphics_draw_line(ctx, s_center, hour_hand);
-    graphics_context_set_stroke_width(ctx, 10);
-    graphics_context_set_stroke_color(ctx, GColorFolly);
-    graphics_draw_line(ctx, s_center, hour_hand);
+    //graphics_context_set_stroke_width(ctx, 8);
+    //graphics_context_set_stroke_color(ctx, GColorBlack);
+    //graphics_draw_line(ctx, s_center, hour_hand);
   }
   if(s_radius > HAND_MARGIN) {
-    graphics_context_set_stroke_width(ctx, 10);
+    graphics_context_set_stroke_width(ctx, 8);
     graphics_context_set_stroke_color(ctx, GColorWhite);
     graphics_draw_line(ctx, s_center, minute_hand);
   }
@@ -223,23 +198,6 @@ static void window_unload(Window *window) {
 
 /*********************************** App **************************************/
 
-static int anim_percentage(AnimationProgress dist_normalized, int max) {
-  return (int)(float)(((float)dist_normalized / (float)ANIMATION_NORMALIZED_MAX) * (float)max);
-}
-
-static void radius_update(Animation *anim, AnimationProgress dist_normalized) {
-  s_radius = anim_percentage(dist_normalized, FINAL_RADIUS);
-
-  layer_mark_dirty(s_canvas_layer);
-}
-
-static void hands_update(Animation *anim, AnimationProgress dist_normalized) {
-  s_anim_time.hours = anim_percentage(dist_normalized, hours_to_minutes(s_last_time.hours));
-  s_anim_time.minutes = anim_percentage(dist_normalized, s_last_time.minutes);
-
-  layer_mark_dirty(s_canvas_layer);
-}
-
 static void init() {
   srand(time(NULL));
 
@@ -255,17 +213,6 @@ static void init() {
   window_stack_push(s_main_window, true);
 
   tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
-
-  // Prepare animations
-  AnimationImplementation radius_impl = {
-    .update = radius_update
-  };
-  animate(ANIMATION_DURATION, ANIMATION_DELAY, &radius_impl, false);
-
-  AnimationImplementation hands_impl = {
-    .update = hands_update
-  };
-  animate(2 * ANIMATION_DURATION, ANIMATION_DELAY, &hands_impl, true);
 }
 
 static void deinit() {
